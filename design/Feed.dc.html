@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Personalized picks feed</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0D1015}
+a{color:#C8F25A}a:hover{color:#E2FF9A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0D1015; color: #F2F4F7; font-family: 'IBM Plex Sans', sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="flex: none; padding: 56px 20px 12px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; text-transform: uppercase">Your edges today</h1>
+        <div style="font-size: 13px; color: #9AA3B2">Scanned 1,284 markets · 4 fit your interests</div>
+      </div>
+      <a href="Alerts.dc.html" aria-label="Alerts" style="position: relative; width: 44px; height: 44px; border-radius: 22px; background: #161A21; display: flex; align-items: center; justify-content: center; color: #F2F4F7">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1112 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 003.4 0"></path></svg>
+        <span style="position: absolute; top: 9px; right: 10px; width: 9px; height: 9px; border-radius: 5px; background: #FF9F43; border: 2px solid #161A21"></span>
+      </a>
+    </div>
+    <div style="display: flex; gap: 8px; overflow-x: auto">
+      <sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+        <sc-if value="{{f.on}}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{f.pick}}" aria-pressed="true" style="flex: none; min-height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: #F2F4F7; color: #0D1015; font: 600 13px 'IBM Plex Sans', sans-serif; cursor: pointer">{{f.label}}</button>
+        </sc-if>
+        <sc-if value="{{f.off}}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{f.pick}}" aria-pressed="false" style="flex: none; min-height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #2A303B; background: #161A21; color: #C9D0DA; font: 500 13px 'IBM Plex Sans', sans-serif; cursor: pointer">{{f.label}}</button>
+        </sc-if>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="flex: 1 1 auto; overflow-y: auto; padding: 4px 20px 20px; display: flex; flex-direction: column; gap: 14px">
+    <sc-for list="{{picks}}" as="p" hint-placeholder-count="3">
+      <a href="PickDetail.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 18px; background: #161A21; border: 1px solid #222832; color: #F2F4F7; text-decoration: none">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #9AA3B2">
+          <span style="font-weight: 600; letter-spacing: 1px; text-transform: uppercase">{{p.league}} · {{p.market}}</span>
+          <span>{{p.time}}</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <div style="font-size: 14px; color: #C9D0DA">{{p.game}}</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 26px; line-height: 1.05; text-transform: uppercase">{{p.pick}}</div>
+            <div style="flex: none; padding: 6px 10px; border-radius: 8px; background: #1E232C; font: 500 15px 'IBM Plex Mono', monospace">{{p.odds}}</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 12px; border-radius: 12px; background: #11151B">
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; color: #9AA3B2; text-transform: uppercase; letter-spacing: 0.8px">Our model</span><span style="font: 500 17px 'IBM Plex Mono', monospace">{{p.model}}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; color: #9AA3B2; text-transform: uppercase; letter-spacing: 0.8px">Market</span><span style="font: 500 17px 'IBM Plex Mono', monospace; color: #C9D0DA">{{p.implied}}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; color: #9AA3B2; text-transform: uppercase; letter-spacing: 0.8px">Edge</span><span style="font: 500 17px 'IBM Plex Mono', monospace; color: #C8F25A">{{p.edge}}</span></div>
+        </div>
+        <div style="font-size: 14px; line-height: 1.45; color: #C9D0DA">{{p.why}}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #C8F25A">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>{{p.match}}
+          </span>
+          <span style="font-size: 12px; color: #9AA3B2">Confidence: <span style="color: #F2F4F7; font-weight: 600">{{p.conf}}</span></span>
+        </div>
+      </a>
+    </sc-for>
+    <div style="font-size: 12px; line-height: 1.5; color: #7D8695; text-align: center; padding: 8px 12px">Edges are model estimates, not guarantees. Set limits in Alerts &amp; controls.</div>
+  </div>
+
+  <nav aria-label="Main" style="flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 8px 8px 28px; background: #11151B; border-top: 1px solid #1E232C">
+    <a href="Feed.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; min-height: 44px; color: #C8F25A; text-decoration: none; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg>Picks</a>
+    <a href="Alerts.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; min-height: 44px; color: #9AA3B2; text-decoration: none; font-size: 11px; font-weight: 500">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1112 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 003.4 0"></path></svg>Alerts</a>
+    <a href="Tracker.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; min-height: 44px; color: #9AA3B2; text-decoration: none; font-size: 11px; font-weight: 500">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Tracker</a>
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; min-height: 44px; color: #9AA3B2; text-decoration: none; font-size: 11px; font-weight: 500">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Interests</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: 'For you' };
+  }
+  renderVals() {
+    const all = [
+      { league: 'NFL', market: 'Total', time: 'Sun 1:00 PM', game: 'Bills @ Dolphins', pick: 'Under 47.5', odds: '-110', model: '58.0%', implied: '52.4%', edge: '+5.6', conf: 'High', why: 'Wind forecast above 15 mph and both offenses have slowed their pace over the last three weeks.', match: 'You follow the Bills' },
+      { league: 'MLB', market: 'Moneyline', time: 'Tonight 7:08 PM', game: 'Mariners @ Tigers', pick: 'Mariners ML', odds: '+145', model: '46.0%', implied: '40.8%', edge: '+5.2', conf: 'Medium', why: 'Seattle’s starter matches up well against this lineup and the price has not moved to reflect it.', match: 'MLB · Balanced style' },
+      { league: 'NFL', market: 'Player prop', time: 'Sun 4:25 PM', game: 'Lions @ Bengals', pick: 'Lions TE o4.5 rec', odds: '+120', model: '50.5%', implied: '45.5%', edge: '+5.0', conf: 'Medium', why: 'Target share up three straight weeks against a defense that struggles to cover tight ends.', match: 'You picked player props' },
+      { league: 'NHL', market: 'Total', time: 'Thu 7:00 PM', game: 'Devils @ Rangers', pick: 'Over 5.5', odds: '-105', model: '55.5%', implied: '51.2%', edge: '+4.3', conf: 'Medium', why: 'Both teams are likely to start backup goalies on the second night of a back-to-back.', match: 'You follow the Rangers' }
+    ];
+    const labels = ['For you', 'NFL', 'MLB', 'NHL'];
+    const f = this.state.filter;
+    const filters = labels.map((l) => ({ label: l, on: f === l, off: f !== l, pick: () => this.setState({ filter: l }) }));
+    const picks = f === 'For you' ? all : all.filter((p) => p.league === f);
+    return { filters, picks };
+  }
+}
+</script>
+</body>
+</html>

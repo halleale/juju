@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pick breakdown</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0D1015}
+a{color:#C8F25A}a:hover{color:#E2FF9A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0D1015; color: #F2F4F7; font-family: 'IBM Plex Sans', sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="flex: 1 1 auto; overflow-y: auto; padding: 52px 20px 24px; display: flex; flex-direction: column; gap: 20px">
+    <a href="Feed.dc.html" aria-label="Back to picks" style="align-self: flex-start; width: 44px; height: 44px; border-radius: 22px; background: #161A21; display: flex; align-items: center; justify-content: center; color: #F2F4F7">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <div style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #9AA3B2">NFL · Total · Sun 1:00 PM</div>
+      <div style="font-size: 15px; color: #C9D0DA">Bills @ Dolphins</div>
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 44px; line-height: 1; text-transform: uppercase">Under 47.5</h1>
+        <div style="padding: 8px 12px; border-radius: 10px; background: #1E232C; font: 500 18px 'IBM Plex Mono', monospace">-110</div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px; border-radius: 16px; background: #161A21">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <div style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #9AA3B2">Model vs market</div>
+        <div style="font: 500 15px 'IBM Plex Mono', monospace; color: #C8F25A">+5.6 pts edge</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; justify-content: space-between; font-size: 13px"><span>Our model</span><span style="font-family: 'IBM Plex Mono', monospace">58.0%</span></div>
+        <div style="height: 10px; border-radius: 5px; background: #0D1015"><div style="width: 58%; height: 10px; border-radius: 5px; background: #C8F25A"></div></div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #C9D0DA"><span>Market implied (-110)</span><span style="font-family: 'IBM Plex Mono', monospace">52.4%</span></div>
+        <div style="height: 10px; border-radius: 5px; background: #0D1015"><div style="width: 52.4%; height: 10px; border-radius: 5px; background: #5B6474"></div></div>
+      </div>
+      <div style="font-size: 13px; color: #9AA3B2">Fair price by our model: <span style="font-family: 'IBM Plex Mono', monospace; color: #F2F4F7">-138</span></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; background: #161A21">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <div style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #9AA3B2">Line movement</div>
+        <div style="font-size: 13px; color: #C9D0DA">Opened 49.5</div>
+      </div>
+      <svg width="318" height="80" viewBox="0 0 318 80" fill="none" role="img" aria-label="Total moved from 49.5 at open to 47.5 now">
+        <path d="M0 20H318M0 60H318" stroke="#222832" stroke-width="1"></path>
+        <path d="M4 14 L70 16 L130 30 L190 34 L250 52 L314 62" stroke="#C8F25A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        <circle cx="314" cy="62" r="4.5" fill="#C8F25A"></circle>
+      </svg>
+      <div style="display: flex; justify-content: space-between; font-size: 12px; color: #9AA3B2"><span>Mon</span><span>Now · 47.5</span></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <div style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #9AA3B2">Why the agent likes it</div>
+      <sc-for list="{{signals}}" as="s" hint-placeholder-count="4">
+        <div style="display: flex; gap: 12px; align-items: flex-start">
+          <sc-if value="{{s.pro}}" hint-placeholder-val="{{ true }}">
+            <span style="flex: none; width: 28px; height: 28px; border-radius: 14px; background: #26300F; color: #C8F25A; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span>
+          </sc-if>
+          <sc-if value="{{s.con}}" hint-placeholder-val="{{ false }}">
+            <span style="flex: none; width: 28px; height: 28px; border-radius: 14px; background: #3A2410; color: #FF9F43; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></span>
+          </sc-if>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">{{s.title}}</span><span style="font-size: 13px; line-height: 1.4; color: #9AA3B2">{{s.detail}}</span></div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #9AA3B2">Best price right now</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 12px; background: #161A21; border: 1.5px solid #C8F25A"><span style="font-size: 14px">[Sportsbook A] <span style="font-size: 12px; color: #C8F25A; margin-left: 6px">Best</span></span><span style="font: 500 15px 'IBM Plex Mono', monospace">-108</span></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 12px; background: #161A21"><span style="font-size: 14px; color: #C9D0DA">[Sportsbook B]</span><span style="font: 500 15px 'IBM Plex Mono', monospace; color: #C9D0DA">-110</span></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 12px; background: #161A21"><span style="font-size: 14px; color: #C9D0DA">[Sportsbook C]</span><span style="font: 500 15px 'IBM Plex Mono', monospace; color: #C9D0DA">-112</span></div>
+    </div>
+
+    <div style="font-size: 13px; line-height: 1.5; color: #9AA3B2">Suggested size: <span style="color: #F2F4F7; font-weight: 600">1 unit</span>, based on your Balanced style. Model estimates, not guarantees.</div>
+  </div>
+
+  <div style="flex: none; padding: 14px 20px 34px; border-top: 1px solid #1E232C; display: flex; gap: 10px">
+    <button onClick="{{toggleAlert}}" aria-pressed="{{alertPressed}}" style="flex: 1; height: 52px; border-radius: 14px; border: 1.5px solid #2A303B; background: #161A21; color: #F2F4F7; font: 600 15px 'IBM Plex Sans', sans-serif; cursor: pointer">{{alertLabel}}</button>
+    <button onClick="{{toggleTrack}}" aria-pressed="{{trackPressed}}" style="flex: 1; height: 52px; border-radius: 14px; border: 0; background: #C8F25A; color: #0D1015; font: 700 15px 'IBM Plex Sans', sans-serif; cursor: pointer">{{trackLabel}}</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tracked: false, alert: false };
+  }
+  renderVals() {
+    const st = this.state;
+    const signals = [
+      { pro: true, con: false, title: 'Wind 15 to 20 mph forecast', detail: 'Totals in games this windy have gone under at a higher rate than the market prices in.' },
+      { pro: true, con: false, title: 'Both offenses slowing down', detail: 'Plays per game down for both teams over the last three weeks.' },
+      { pro: true, con: false, title: 'Line already moving our way', detail: 'Dropped two points since open, a sign other sharp bettors agree.' },
+      { pro: false, con: true, title: 'Big-play risk', detail: 'Miami’s offense can score quickly, which adds variance to any under.' }
+    ];
+    return {
+      signals,
+      trackLabel: st.tracked ? 'Tracking' : 'Track pick',
+      trackPressed: st.tracked ? 'true' : 'false',
+      toggleTrack: () => this.setState({ tracked: !st.tracked }),
+      alertLabel: st.alert ? 'Alert on' : 'Alert if line moves',
+      alertPressed: st.alert ? 'true' : 'false',
+      toggleAlert: () => this.setState({ alert: !st.alert })
+    };
+  }
+}
+</script>
+</body>
+</html>

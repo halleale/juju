@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Alerts and controls</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0D1015}
+a{color:#C8F25A}a:hover{color:#E2FF9A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0D1015; color: #F2F4F7; font-family: 'IBM Plex Sans', sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="flex: 1 1 auto; overflow-y: auto; padding: 56px 20px 24px; display: flex; flex-direction: column; gap: 24px">
+    <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; text-transform: uppercase">Alerts</h1>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #9AA3B2">Recent</div>
+      <a href="PickDetail.dc.html" style="display: flex; gap: 12px; padding: 14px; border-radius: 14px; background: #161A21; color: #F2F4F7; text-decoration: none">
+        <span style="flex: none; width: 36px; height: 36px; border-radius: 18px; background: #26300F; color: #C8F25A; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px; font-weight: 600">New edge: Bills/Dolphins Under 47.5</span><span style="font-size: 13px; line-height: 1.4; color: #9AA3B2">+5.6 pts vs the market. Matches a team you follow.</span><span style="font-size: 12px; color: #7D8695">12 min ago</span></span>
+      </a>
+      <a href="PickDetail.dc.html" style="display: flex; gap: 12px; padding: 14px; border-radius: 14px; background: #161A21; color: #F2F4F7; text-decoration: none">
+        <span style="flex: none; width: 36px; height: 36px; border-radius: 18px; background: #3A2410; color: #FF9F43; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px; font-weight: 600">Line moved on a pick you track</span><span style="font-size: 13px; line-height: 1.4; color: #9AA3B2">Rangers/Devils total now 6. Edge dropped to +1.9, below your threshold.</span><span style="font-size: 12px; color: #7D8695">2 hr ago</span></span>
+      </a>
+      <a href="Feed.dc.html" style="display: flex; gap: 12px; padding: 14px; border-radius: 14px; background: #161A21; color: #F2F4F7; text-decoration: none">
+        <span style="flex: none; width: 36px; height: 36px; border-radius: 18px; background: #1E232C; color: #C9D0DA; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4M12 16h.01"></path></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px; font-weight: 600">Injury news changed a pick</span><span style="font-size: 13px; line-height: 1.4; color: #9AA3B2">Lions TE prop pulled after a practice report. Removed from your feed.</span><span style="font-size: 12px; color: #7D8695">Yesterday</span></span>
+      </a>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <div style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #9AA3B2">Only alert me when the edge is at least</div>
+      <div role="group" aria-label="Minimum edge" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 4px; border-radius: 14px; background: #161A21">
+        <sc-for list="{{edges}}" as="e" hint-placeholder-count="3">
+          <sc-if value="{{e.on}}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{e.pick}}" aria-pressed="true" style="height: 44px; border-radius: 10px; border: 0; background: #C8F25A; color: #0D1015; font: 600 15px 'IBM Plex Mono', monospace; cursor: pointer">{{e.label}}</button>
+          </sc-if>
+          <sc-if value="{{e.off}}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{e.pick}}" aria-pressed="false" style="height: 44px; border-radius: 10px; border: 0; background: transparent; color: #C9D0DA; font: 500 15px 'IBM Plex Mono', monospace; cursor: pointer">{{e.label}}</button>
+          </sc-if>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 2px; border-radius: 14px; background: #161A21; padding: 4px 16px">
+      <sc-for list="{{toggles}}" as="t" hint-placeholder-count="4">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 56px; border-bottom: 1px solid #1E232C">
+          <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px">{{t.label}}</span><span style="font-size: 12px; color: #9AA3B2">{{t.desc}}</span></span>
+          <sc-if value="{{t.on}}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{t.toggle}}" role="switch" aria-checked="true" aria-label="{{t.label}}" style="flex: none; width: 52px; height: 32px; border-radius: 16px; border: 0; background: #C8F25A; padding: 3px; display: flex; justify-content: flex-end; cursor: pointer"><span style="width: 26px; height: 26px; border-radius: 13px; background: #0D1015"></span></button>
+          </sc-if>
+          <sc-if value="{{t.off}}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{t.toggle}}" role="switch" aria-checked="false" aria-label="{{t.label}}" style="flex: none; width: 52px; height: 32px; border-radius: 16px; border: 0; background: #2A303B; padding: 3px; display: flex; justify-content: flex-start; cursor: pointer"><span style="width: 26px; height: 26px; border-radius: 13px; background: #9AA3B2"></span></button>
+          </sc-if>
+        </div>
+      </sc-for>
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 56px">
+        <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px">Max alerts per day</span><span style="font-size: 12px; color: #9AA3B2">Strongest edges sent first</span></span>
+        <span style="display: flex; align-items: center; gap: 4px">
+          <button onClick="{{dec}}" aria-label="Fewer alerts" style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: #1E232C; color: #F2F4F7; font-size: 20px; cursor: pointer">−</button>
+          <span style="width: 28px; text-align: center; font: 500 16px 'IBM Plex Mono', monospace">{{max}}</span>
+          <button onClick="{{inc}}" aria-label="More alerts" style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: #1E232C; color: #F2F4F7; font-size: 20px; cursor: pointer">+</button>
+        </span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 14px; border: 1px solid #2A303B">
+      <div style="font-size: 15px; font-weight: 600">Play within your limits</div>
+      <div style="font-size: 13px; line-height: 1.45; color: #9AA3B2">Set a weekly budget and the agent pauses alerts once you hit it.</div>
+      <a href="Alerts.dc.html" style="font-size: 14px; font-weight: 600">Set a weekly limit</a>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 8px 8px 28px; background: #11151B; border-top: 1px solid #1E232C">
+    <a href="Feed.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; min-height: 44px; color: #9AA3B2; text-decoration: none; font-size: 11px; font-weight: 500">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg>Picks</a>
+    <a href="Alerts.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; min-height: 44px; color: #C8F25A; text-decoration: none; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1112 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 003.4 0"></path></svg>Alerts</a>
+    <a href="Tracker.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; min-height: 44px; color: #9AA3B2; text-decoration: none; font-size: 11px; font-weight: 500">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Tracker</a>
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; min-height: 44px; color: #9AA3B2; text-decoration: none; font-size: 11px; font-weight: 500">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Interests</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { edge: '+5', max: 5, t: { edges: true, moves: true, injuries: true, quiet: false } };
+  }
+  renderVals() {
+    const st = this.state;
+    const edges = ['+3', '+5', '+7'].map((v) => ({ label: v + ' pts', on: st.edge === v, off: st.edge !== v, pick: () => this.setState({ edge: v }) }));
+    const defs = [
+      { id: 'edges', label: 'New edges', desc: 'Picks that match your interests' },
+      { id: 'moves', label: 'Line moves', desc: 'When a tracked pick gains or loses value' },
+      { id: 'injuries', label: 'Injury news', desc: 'When news changes a pick' },
+      { id: 'quiet', label: 'Quiet hours', desc: '11 PM to 8 AM' }
+    ];
+    const toggles = defs.map((d) => ({ ...d, on: st.t[d.id], off: !st.t[d.id], toggle: () => this.setState({ t: { ...st.t, [d.id]: !st.t[d.id] } }) }));
+    return {
+      edges, toggles, max: st.max,
+      dec: () => this.setState({ max: Math.max(1, st.max - 1) }),
+      inc: () => this.setState({ max: Math.min(20, st.max + 1) })
+    };
+  }
+}
+</script>
+</body>
+</html>
