@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
 
+import { AuthProvider } from '@/state/auth';
 import { SettingsProvider } from '@/state/settings';
 import { colors } from '@/theme';
 
@@ -29,9 +30,11 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
 
   return (
-    <SettingsProvider>
-      <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
-    </SettingsProvider>
+    <AuthProvider>
+      <SettingsProvider>
+        <StatusBar style="light" />
+        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
+      </SettingsProvider>
+    </AuthProvider>
   );
 }

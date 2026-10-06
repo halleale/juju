@@ -1,14 +1,17 @@
 import { router } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Logo } from '@/components/icons';
 import { InterestsForm } from '@/components/interests-form';
 import { Display, Footer, PrimaryButton, Screen } from '@/components/ui';
+import { useAuth } from '@/state/auth';
 import { useSettings } from '@/state/settings';
 import { colors, fonts } from '@/theme';
 
 export default function Onboarding() {
   const { settings } = useSettings();
+  const { enabled, session } = useAuth();
+  const needsAccount = enabled && !session;
   const ready = settings.sports.length > 0 && settings.betTypes.length > 0;
 
   return (
@@ -20,6 +23,13 @@ export default function Onboarding() {
             Following {settings.sports.length} sports · {settings.betTypes.length} bet types
           </Text>
           <PrimaryButton label="Build my feed" disabled={!ready} onPress={() => router.push('/onboarding/confirm')} />
+          {needsAccount && (
+            <Pressable accessibilityRole="button" onPress={() => router.push('/sign-in')} hitSlop={6} style={s.signIn}>
+              <Text style={s.signInText}>
+                Already have an account? <Text style={s.signInLink}>Sign in</Text>
+              </Text>
+            </Pressable>
+          )}
         </Footer>
       }>
       <View style={s.top}>
@@ -27,7 +37,7 @@ export default function Onboarding() {
           <Logo />
           <Text style={s.wordmark}>JUJU</Text>
         </View>
-        <Text style={s.step}>Step 1 of 2</Text>
+        <Text style={s.step}>Step 1 of {needsAccount ? 3 : 2}</Text>
       </View>
 
       <View style={{ gap: 8 }}>
@@ -47,5 +57,8 @@ const s = StyleSheet.create({
   step: { fontFamily: fonts.sans, fontSize: 13, color: colors.muted },
   title: { fontSize: 38, lineHeight: 39 },
   lede: { fontFamily: fonts.sans, fontSize: 15, lineHeight: 22, color: colors.muted },
+  signIn: { minHeight: 32, alignItems: 'center', justifyContent: 'center' },
+  signInText: { fontFamily: fonts.sans, fontSize: 14, color: colors.muted },
+  signInLink: { fontFamily: fonts.sansSemi, color: colors.accent },
   summary: { fontFamily: fonts.sans, fontSize: 13, color: colors.muted, textAlign: 'center' },
 });

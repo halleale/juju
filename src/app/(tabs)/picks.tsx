@@ -42,7 +42,7 @@ export default function Picks() {
             {labels.map((l) => {
               const on = l === filter;
               return (
-                <Pressable key={l} onPress={() => setFilter(l)} accessibilityRole="button" accessibilityState={{ selected: on }} hitSlop={4} style={[s.filter, on ? s.filterOn : s.filterOff]}>
+                <Pressable key={l} onPress={() => setFilter(l)} accessibilityRole="button" aria-selected={on} hitSlop={4} style={[s.filter, on ? s.filterOn : s.filterOff]}>
                   <Text style={[s.filterText, on && s.filterTextOn]}>{l}</Text>
                 </Pressable>
               );

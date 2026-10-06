@@ -89,7 +89,7 @@ export function InterestsForm() {
         {STYLES.map((r) => {
           const on = settings.style === r.id;
           return (
-            <Pressable key={r.id} accessibilityRole="radio" accessibilityState={{ checked: on }} onPress={() => update({ style: r.id })} style={[s.style, on ? s.styleOn : s.styleOff]}>
+            <Pressable key={r.id} accessibilityRole="radio" aria-checked={on} onPress={() => update({ style: r.id })} style={[s.style, on ? s.styleOn : s.styleOff]}>
               <View style={[s.radio, on ? s.radioOn : s.radioOff]} />
               <View style={s.styleText}>
                 <Text style={s.styleLabel}>{r.label}</Text>

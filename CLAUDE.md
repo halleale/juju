@@ -66,7 +66,7 @@ Proprietary sport-specific models (pace, weather, injuries) come later and plug 
 
 ## Data model (starting point)
 
-- `users`: id, style, min_edge, max_alerts_per_day, quiet_hours, weekly_limit
+- `users`: id, style, min_edge, max_alerts_per_day, quiet_hours, weekly_limit (implemented as `profiles`, keyed to `auth.users`)
 - `user_interests`: user_id, kind (sport | bet_type | team | player), value
 - `events`: id, sport, league, home, away, start_time, status, final_score
 - `markets`: id, event_id, type (spread | total | moneyline | prop), line, selection
@@ -97,10 +97,14 @@ Proprietary sport-specific models (pace, weather, injuries) come later and plug 
 - Step 1 done: Expo SDK 57 app (Expo Router, routes in `src/app/`), theme tokens in `src/theme.ts`, custom tab bar, all mobile screens on mock data in `src/data/mock.ts`. Tracker was built from this brief since its design file was not provided.
 - Onboarding step 2 is the 21+ age gate, terms and helpline.
 - Math lives in `src/lib/` (`odds.ts`, `consensus.ts`, `picks.ts`, `tracker.ts`) with tests in `tests/`. Edge is always measured against the best available price.
-- Settings are in memory (`src/state/settings.tsx`) until auth lands in step 2.
+- Step 2 done: Supabase auth with email one-time codes (`src/state/auth.tsx`, `src/app/sign-in.tsx`). Onboarding is interests, then age gate, then sign-in. Settings sync to `profiles` / `user_interests` (`src/state/settings.tsx`, mapping in `src/lib/settings-sync.ts`). An account that already finished onboarding wins on sign-in; otherwise local choices are uploaded. Without `EXPO_PUBLIC_SUPABASE_*` env vars the app runs in demo mode.
+- Schema for all tables in the data model is in `supabase/migrations/`. Pipeline tables (events, markets, odds_snapshots, picks) are read-only to users; jobs write them with the service role.
+- Tracked picks and line alerts are still local until picks come from the database (step 3).
+- Use ARIA props (`aria-checked`, `aria-selected`) rather than `accessibilityState`; React Native Web drops the latter.
 
 ## Commands
 
 - `npm start` / `npm run web`: dev server
 - `npm test`: unit tests (Vitest)
+- `npm run test:db`: migrations + RLS checks on a throwaway local Postgres (needs Postgres 15+ binaries)
 - `npm run typecheck`, `npm run lint`

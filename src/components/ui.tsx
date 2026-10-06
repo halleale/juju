@@ -53,7 +53,7 @@ export function Footer({ children, style }: { children: ReactNode; style?: Style
 
 export function Chip({ label, on, onPress }: { label: string; on: boolean; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
+    <Pressable onPress={onPress} accessibilityRole="button" aria-selected={on} style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
       <Text style={[styles.chipText, on && styles.chipTextOn]}>{label}</Text>
     </Pressable>
   );
@@ -65,7 +65,7 @@ export function Switch({ value, onChange, label }: { value: boolean; onChange: (
       onPress={() => onChange(!value)}
       accessibilityRole="switch"
       accessibilityLabel={label}
-      accessibilityState={{ checked: value }}
+      aria-checked={value}
       style={[styles.switch, value ? styles.switchOn : styles.switchOff]}>
       <View style={[styles.knob, { backgroundColor: value ? colors.bg : colors.muted }]} />
     </Pressable>
@@ -74,7 +74,7 @@ export function Switch({ value, onChange, label }: { value: boolean; onChange: (
 
 export function PrimaryButton({ label, onPress, disabled, style }: { label: string; onPress: () => void; disabled?: boolean; style?: StyleProp<ViewStyle> }) {
   return (
-    <Pressable onPress={onPress} disabled={disabled} accessibilityRole="button" accessibilityState={{ disabled }} style={({ pressed }) => [styles.primary, (pressed || disabled) && { opacity: disabled ? 0.4 : 0.85 }, style]}>
+    <Pressable onPress={onPress} disabled={disabled} accessibilityRole="button" aria-disabled={disabled} style={({ pressed }) => [styles.primary, (pressed || disabled) && { opacity: disabled ? 0.4 : 0.85 }, style]}>
       <Text style={styles.primaryText}>{label}</Text>
     </Pressable>
   );

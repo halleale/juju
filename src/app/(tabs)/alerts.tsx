@@ -62,7 +62,7 @@ export default function Alerts() {
           {EDGES.map((e) => {
             const on = settings.minEdge === e;
             return (
-              <Pressable key={e} accessibilityRole="radio" accessibilityState={{ checked: on }} onPress={() => update({ minEdge: e })} style={[s.segBtn, on && { backgroundColor: colors.accent }]}>
+              <Pressable key={e} accessibilityRole="radio" aria-checked={on} onPress={() => update({ minEdge: e })} style={[s.segBtn, on && { backgroundColor: colors.accent }]}>
                 <Text style={[s.segText, on && { color: colors.onAccent }]}>+{e} pts</Text>
               </Pressable>
             );
@@ -123,7 +123,7 @@ export default function Alerts() {
 
 function LimitChip({ label, on, onPress }: { label: string; on: boolean; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="radio" accessibilityState={{ checked: on }} onPress={onPress} style={[s.limitChip, on && { backgroundColor: colors.accent, borderColor: colors.accent }]}>
+    <Pressable accessibilityRole="radio" aria-checked={on} onPress={onPress} style={[s.limitChip, on && { backgroundColor: colors.accent, borderColor: colors.accent }]}>
       <Text style={[s.limitChipText, on && { color: colors.onAccent }]}>{label}</Text>
     </Pressable>
   );

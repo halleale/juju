@@ -26,7 +26,7 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
             <Pressable
               key={route.key}
               accessibilityRole="tab"
-              accessibilityState={{ selected: focused }}
+              aria-selected={focused}
               onPress={() => {
                 const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
                 if (!focused && !event.defaultPrevented) navigation.navigate(route.name);

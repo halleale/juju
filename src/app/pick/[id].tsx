@@ -41,10 +41,10 @@ export default function PickDetail() {
       gap={20}
       footer={
         <Footer style={s.actions}>
-          <Pressable accessibilityRole="button" accessibilityState={{ selected: alertOn }} onPress={() => toggleIn('lineAlerts', pick.id)} style={[s.btn, s.btnGhost]}>
+          <Pressable accessibilityRole="button" aria-selected={alertOn} onPress={() => toggleIn('lineAlerts', pick.id)} style={[s.btn, s.btnGhost]}>
             <Text style={s.btnGhostText}>{alertOn ? 'Alert on' : 'Alert if line moves'}</Text>
           </Pressable>
-          <Pressable accessibilityRole="button" accessibilityState={{ selected: tracked }} onPress={() => toggleIn('tracked', pick.id)} style={[s.btn, s.btnPrimary]}>
+          <Pressable accessibilityRole="button" aria-selected={tracked} onPress={() => toggleIn('tracked', pick.id)} style={[s.btn, s.btnPrimary]}>
             <Text style={s.btnPrimaryText}>{tracked ? 'Tracking' : 'Track pick'}</Text>
           </Pressable>
         </Footer>

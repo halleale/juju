@@ -4,12 +4,15 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BackIcon, CheckIcon } from '@/components/icons';
 import { Display, Footer, PrimaryButton, Screen } from '@/components/ui';
+import { useAuth } from '@/state/auth';
 import { useSettings } from '@/state/settings';
 import { colors, fonts } from '@/theme';
 
 /** Step 2: 21+ age gate, terms, and responsible-play info. */
 export default function Confirm() {
   const { update } = useSettings();
+  const { enabled, session } = useAuth();
+  const needsAccount = enabled && !session;
   const [age, setAge] = useState(false);
   const [terms, setTerms] = useState(false);
 
@@ -18,11 +21,12 @@ export default function Confirm() {
       footer={
         <Footer>
           <PrimaryButton
-            label="Show my edges"
+            label={needsAccount ? 'Continue' : 'Show my edges'}
             disabled={!age || !terms}
             onPress={() => {
               update({ onboarded: true, ageConfirmed: true });
-              router.replace('/picks');
+              if (needsAccount) router.push({ pathname: '/sign-in', params: { from: 'onboarding' } });
+              else router.replace('/picks');
             }}
           />
         </Footer>
@@ -31,7 +35,7 @@ export default function Confirm() {
         <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={s.back}>
           <BackIcon size={20} color={colors.text} />
         </Pressable>
-        <Text style={s.step}>Step 2 of 2</Text>
+        <Text style={s.step}>Step 2 of {needsAccount ? 3 : 2}</Text>
       </View>
 
       <View style={{ gap: 8 }}>
@@ -54,7 +58,7 @@ export default function Confirm() {
 
 function Check({ on, onPress, label }: { on: boolean; onPress: () => void; label: string }) {
   return (
-    <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={onPress} style={[s.check, on && { borderColor: colors.accent, backgroundColor: colors.accentTint }]}>
+    <Pressable accessibilityRole="checkbox" aria-checked={on} onPress={onPress} style={[s.check, on && { borderColor: colors.accent, backgroundColor: colors.accentTint }]}>
       <View style={[s.box, on && { backgroundColor: colors.accent, borderColor: colors.accent }]}>{on && <CheckIcon size={14} color={colors.onAccent} strokeWidth={3} />}</View>
       <Text style={s.checkLabel}>{label}</Text>
     </Pressable>
