@@ -1,0 +1,53 @@
+[
+  {
+    "id": "evt-bills-chiefs",
+    "sport_key": "americanfootball_nfl",
+    "sport_title": "NFL",
+    "commence_time": "2030-01-06T21:25:00Z",
+    "home_team": "Kansas City Chiefs",
+    "away_team": "Buffalo Bills",
+    "bookmakers": [
+      {
+        "key": "pinnacle",
+        "title": "Pinnacle",
+        "last_update": "2030-01-05T12:00:00Z",
+        "markets": [
+          { "key": "h2h", "outcomes": [{ "name": "Buffalo Bills", "price": 120 }, { "name": "Kansas City Chiefs", "price": -135 }] },
+          { "key": "spreads", "outcomes": [{ "name": "Buffalo Bills", "price": -104, "point": 2.5 }, { "name": "Kansas City Chiefs", "price": -106, "point": -2.5 }] },
+          { "key": "totals", "outcomes": [{ "name": "Over", "price": -103, "point": 47.5 }, { "name": "Under", "price": -107, "point": 47.5 }] }
+        ]
+      },
+      {
+        "key": "draftkings",
+        "title": "DraftKings",
+        "last_update": "2030-01-05T12:00:00Z",
+        "markets": [
+          { "key": "h2h", "outcomes": [{ "name": "Buffalo Bills", "price": 115 }, { "name": "Kansas City Chiefs", "price": -135 }] },
+          { "key": "spreads", "outcomes": [{ "name": "Buffalo Bills", "price": -110, "point": 2.5 }, { "name": "Kansas City Chiefs", "price": -110, "point": -2.5 }] },
+          { "key": "totals", "outcomes": [{ "name": "Over", "price": -110, "point": 47.5 }, { "name": "Under", "price": -110, "point": 47.5 }] }
+        ]
+      },
+      {
+        "key": "fanduel",
+        "title": "FanDuel",
+        "last_update": "2030-01-05T12:00:00Z",
+        "markets": [
+          { "key": "h2h", "outcomes": [{ "name": "Buffalo Bills", "price": 136 }, { "name": "Kansas City Chiefs", "price": -160 }] },
+          { "key": "spreads", "outcomes": [{ "name": "Buffalo Bills", "price": -112, "point": 3 }, { "name": "Kansas City Chiefs", "price": -108, "point": -3 }] },
+          { "key": "totals", "outcomes": [{ "name": "Over", "price": -108, "point": 47.5 }, { "name": "Under", "price": -112, "point": 47.5 }] }
+        ]
+      },
+      {
+        "key": "betmgm",
+        "title": "BetMGM",
+        "last_update": "2030-01-05T12:00:00Z",
+        "markets": [
+          { "key": "h2h", "outcomes": [{ "name": "Buffalo Bills", "price": 118 }, { "name": "Kansas City Chiefs", "price": -140 }] },
+          { "key": "spreads", "outcomes": [{ "name": "Buffalo Bills", "price": -110, "point": 2.5 }, { "name": "Kansas City Chiefs", "price": -110, "point": -2.5 }] },
+          { "key": "totals", "outcomes": [{ "name": "Over", "price": -110, "point": 47.5 }, { "name": "Under", "price": 0, "point": 47.5 }] },
+          { "key": "player_pass_tds", "outcomes": [{ "name": "Over", "price": 120, "point": 1.5, "description": "Josh Allen" }] }
+        ]
+      }
+    ]
+  }
+]

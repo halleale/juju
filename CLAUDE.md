@@ -99,7 +99,9 @@ Proprietary sport-specific models (pace, weather, injuries) come later and plug 
 - Math lives in `src/lib/` (`odds.ts`, `consensus.ts`, `picks.ts`, `tracker.ts`) with tests in `tests/`. Edge is always measured against the best available price.
 - Step 2 done: Supabase auth with email one-time codes (`src/state/auth.tsx`, `src/app/sign-in.tsx`). Onboarding is interests, then age gate, then sign-in. Settings sync to `profiles` / `user_interests` (`src/state/settings.tsx`, mapping in `src/lib/settings-sync.ts`). An account that already finished onboarding wins on sign-in; otherwise local choices are uploaded. Without `EXPO_PUBLIC_SUPABASE_*` env vars the app runs in demo mode.
 - Schema for all tables in the data model is in `supabase/migrations/`. Pipeline tables (events, markets, odds_snapshots, picks) are read-only to users; jobs write them with the service role.
-- Tracked picks and line alerts are still local until picks come from the database (step 3).
+- Step 3 in progress: odds ingest and scoring are built, the feed is not wired yet. Provider is The Odds API behind `OddsProvider` (`src/pipeline/`). The `ingest-odds` Edge Function fetches pre-game moneylines, spreads and totals for 10 books, calls the `ingest_odds` RPC (stores a snapshot only when a book's price changes) and `record_picks` (opens a pick at edge >= 3 pts, pulls it below 1.5, drops edges over 15 as bad data). Book ids (e.g. `pinnacle`) are stored; `src/pipeline/books.ts` has display names. Picks keep the price at the time they opened, for CLV.
+- `src/pipeline/` and anything it imports must use explicit `.ts` import paths and no `@/` alias, because Deno runs it.
+- Tracked picks and line alerts are still local until the feed reads picks from the database.
 - Use ARIA props (`aria-checked`, `aria-selected`) rather than `accessibilityState`; React Native Web drops the latter.
 
 ## Commands

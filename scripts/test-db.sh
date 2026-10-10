@@ -24,4 +24,6 @@ PSQL=("$PG_BIN/psql" -h /tmp -p "$PORT" -U postgres -d postgres -q -v ON_ERROR_S
 for f in "$ROOT"/supabase/migrations/*.sql; do
   "${PSQL[@]}" -f "$f"
 done
-"${PSQL[@]}" -o /dev/null -f "$ROOT/supabase/tests/rls_test.sql"
+for t in rls_test ingest_test; do
+  "${PSQL[@]}" -o /dev/null -f "$ROOT/supabase/tests/$t.sql"
+done

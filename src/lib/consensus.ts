@@ -1,4 +1,4 @@
-import { impliedProb, noVig } from './odds';
+import { impliedProb, noVig } from './odds.ts';
 
 /**
  * v1 market-based model: a consensus fair probability built from the no-vig prices
