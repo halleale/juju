@@ -1,3 +1,4 @@
+import { isDue, type SportStatus } from './schedule.ts';
 import { scoreEvent, selectPicks, SCORE_DEFAULTS, type ScoredPick } from './score.ts';
 import type { OddsProvider, ProviderEvent, ProviderUsage } from './types.ts';
 
@@ -43,4 +44,23 @@ export async function runIngest({ provider, store, sports, now = new Date(), thr
     }
   }
   return out;
+}
+
+/** Poll bookkeeping for the schedule. */
+export interface ScheduleStore {
+  status(sports: string[]): Promise<SportStatus[]>;
+  logPoll(summary: SportSummary, polledAt: Date): Promise<void>;
+}
+
+/**
+ * Polls only the sports that are due (see schedule.ts), or all of them with `force`,
+ * and logs each poll, failed or not, so a broken key does not retry on every wake-up.
+ */
+export async function runScheduled(opts: IngestOptions & { schedule: ScheduleStore; force?: boolean }) {
+  const now = opts.now ?? new Date();
+  const statuses = await opts.schedule.status(opts.sports);
+  const due = opts.force ? opts.sports : statuses.filter((s) => isDue(s, now)).map((s) => s.sport);
+  const summary = due.length ? await runIngest({ ...opts, sports: due, now }) : [];
+  for (const s of summary) await opts.schedule.logPoll(s, now);
+  return { due, skipped: opts.sports.filter((s) => !due.includes(s)), summary };
 }

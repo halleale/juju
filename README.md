@@ -26,25 +26,25 @@ Without Supabase keys the app runs in **demo mode**: no sign-in, and settings re
 
 A scheduled Supabase Edge Function, `supabase/functions/ingest-odds`, pulls pre-game odds, stores every price change in `odds_snapshots`, scores each market against a weighted no-vig consensus (Pinnacle counts 3x) and opens or pulls rows in `picks`. The logic lives in `src/pipeline/`; the provider sits behind the `OddsProvider` interface so another source can be added as one adapter.
 
-1. Get a key at [the-odds-api.com](https://the-odds-api.com). Each run costs about 3 credits per league (3 markets, 10 books), and the function logs what each call actually cost.
+1. Get a key at [the-odds-api.com](https://the-odds-api.com). Each poll costs about 3 credits per league (3 markets, 10 books), and every poll's actual cost is logged.
 2. Apply the migrations (step 2 above), then set the function's secrets. `INGEST_SECRET` is any long random string:
    ```bash
    npx supabase secrets set ODDS_API_KEY=... INGEST_SECRET=...
-   # Optional, defaults to NFL, College FB, NBA, MLB, NHL:
+   # Optional, defaults to NFL. Other sports use the same kickoff-based schedule:
    npx supabase secrets set ODDS_SPORTS="NFL,NBA"
    ```
 3. Deploy. `--use-api` lets the function import `src/pipeline/`:
    ```bash
    npx supabase functions deploy ingest-odds --no-verify-jwt --use-api
    ```
-4. Run it once by hand and check the summary (events, snapshots, picks created and pulled, credits used):
+4. Run it once by hand. `force=1` polls even if the schedule says it is not due. The response shows events, snapshots, picks created and pulled, and credits used:
    ```bash
-   curl -X POST https://<ref>.supabase.co/functions/v1/ingest-odds -H "x-ingest-secret: <INGEST_SECRET>"
+   curl -X POST "https://<ref>.supabase.co/functions/v1/ingest-odds?force=1" -H "x-ingest-secret: <INGEST_SECRET>"
    ```
 5. Schedule it. In the dashboard, enable the `pg_cron` and `pg_net` extensions, store the secret in Vault, and run in the SQL editor:
    ```sql
    select vault.create_secret('<INGEST_SECRET>', 'ingest_secret');
-   select cron.schedule('ingest-odds', '*/10 * * * *', $$
+   select cron.schedule('ingest-odds', '*/5 * * * *', $$
      select net.http_post(
        url := 'https://<ref>.supabase.co/functions/v1/ingest-odds',
        headers := jsonb_build_object('x-ingest-secret',
@@ -52,7 +52,22 @@ A scheduled Supabase Edge Function, `supabase/functions/ingest-odds`, pulls pre-
      );
    $$);
    ```
-   Every 10 minutes across four in-season leagues is roughly 50-100K credits a month. Check the credits in the logs before tightening the schedule.
+   Waking every 5 minutes is free; a sport is only polled when it is due (`src/pipeline/schedule.ts`):
+
+   | Next kickoff | Poll every |
+   |---|---|
+   | within 90 min | 5 min |
+   | within 6 h | 10 min |
+   | within 24 h | 30 min |
+   | within 3 days | 2 h |
+   | later, or none known | 4 h |
+
+   No polls 1am-8am Eastern unless a game starts within 6 hours. For a normal NFL week (Thursday, Sunday, Monday games) that is about 330 polls, roughly 1,000 credits a week or 4,000 a month, which fits the 20K plan.
+6. Check credit use:
+   ```sql
+   select date_trunc('day', polled_at) as day, count(*) as polls, sum(credits) as credits, min(credits_remaining) as remaining
+   from ingest_log group by 1 order by 1 desc;
+   ```
 
 ## Check it
 

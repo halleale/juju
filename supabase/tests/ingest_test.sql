@@ -66,3 +66,28 @@ select (public.record_picks('{g1}', :'pick', :'pick') ->> 'created')::int = 1 as
 reset role;
 
 \echo 'All pipeline checks passed.'
+
+-- Poll schedule status.
+set role service_role;
+insert into public.ingest_log (sport, polled_at, ok) values ('NFL', '2029-12-30T00:00:00Z', true), ('NFL', '2029-12-30T01:00:00Z', false);
+do $$ begin
+  assert (select last_polled_at from public.ingest_status('{NFL}')) = '2029-12-30T01:00:00Z', 'last poll, failed or not';
+  assert (select next_kickoff from public.ingest_status('{NFL}')) = (select start_time from public.events where external_id = 'evt1'), 'next kickoff is the earliest upcoming game';
+  assert (select last_polled_at is null and next_kickoff is null from public.ingest_status('{NHL}')), 'unknown sport';
+end $$;
+reset role;
+set role authenticated;
+do $$ begin
+  begin
+    perform count(*) from public.ingest_log;
+    assert false, 'users must not read ingest_log';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform public.ingest_status('{NFL}');
+    assert false, 'users must not call ingest_status';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+\echo 'Poll schedule checks passed.'
