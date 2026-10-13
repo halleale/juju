@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { price, decimalOdds, eligible, validateBet, agentReply } from '../src/domain.ts';
+import { price, decimalOdds, eligible, validateBet } from '../src/domain.ts';
+import { agentReply } from '../src/agent.ts';
 const p = { id: 'test', kickoff: '2026-11-15T21:00:00Z', status: 'active', selection: 'Team A', line: null, win: .5, push: 0, odds: 110, evidence: ['Sample evidence'], risks: ['Sample risk'] };
 test('PRD example returns 5% at +110 and negative return at -110', () => {
   assert.ok(Math.abs(price(.5, 0, 110).expectedReturn - .05) < 1e-10);

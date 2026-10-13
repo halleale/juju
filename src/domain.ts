@@ -1,3 +1,4 @@
+import type { ResearchSnapshot } from './research';
 export type Market = 'Moneyline' | 'Spread' | 'Total';
 export type Outcome = 'win' | 'loss' | 'push' | 'void' | 'pending';
 export type Pick = {
@@ -5,7 +6,7 @@ export type Pick = {
   selection: string; line: number | null; odds: number; book: string;
   win: number; push: number; evidence: string[]; risks: string[];
   status: 'active' | 'watching' | 'withdrawn' | 'settled';
-  outcome: Outcome; version: string;
+  outcome: Outcome; version: string; research?: ResearchSnapshot;
 };
 export type ManualBet = { id: string; pickId: string; book: string; odds: number; line: number | null; stake: number | null; recordedAt: string };
 export const BOOKS = ['DraftKings', 'FanDuel', 'BetMGM'];
@@ -35,15 +36,4 @@ export function eligible(pick: Pick, now: number, receivedAt: number) {
   const kickoff = Date.parse(pick.kickoff);
   const limit = kickoff - now <= 60 * 60 * 1000 ? 2 * 60 * 1000 : 5 * 60 * 1000;
   return pick.status === 'active' && now < kickoff && now >= receivedAt && now - receivedAt <= limit;
-}
-export function agentReply(pick: Pick, question: string) {
-  if (/parlay|prop|teaser|live bet/i.test(question)) return 'This prototype covers pregame moneylines, main spreads, and full-game totals. That market is outside the current scope.';
-  if (/recover|chase|win back|lost money/i.test(question)) return 'A previous loss does not change this game’s probabilities. Take a break if useful; this app does not recommend larger stakes or loss-recovery strategies.';
-  if (/injur|weather|current|latest/i.test(question)) return 'Live injury, weather, and sportsbook feeds are not connected. I cannot verify current facts or quotes. The evidence below is fictional demonstration data.';
-  const match = question.match(/(?:at\s*)?([+-]\d{3,4})\b/i);
-  let odds = pick.odds;
-  if (match) odds = Number(match[1]);
-  if (!validOdds(odds)) return 'Enter valid American odds, for example +110 or -125.';
-  const result = price(pick.win, pick.push, odds);
-  return `Demo decision: ${pick.status === 'watching' ? 'wait for missing evidence' : result.expectedReturn > 0 ? 'positive estimated return in this fictional example' : 'pass at this price'}.\n\nExact quote: ${pick.selection}${pick.line !== null ? ` (${pick.line})` : ''} at ${american(odds)}. ${match ? 'User-supplied price; availability is unverified.' : 'Fictional sportsbook quote.'}\n\nExpected return: ${(result.expectedReturn * 100).toFixed(1)}% per unit. This is illustrative, not a validated edge or a live recommendation.\n\nEvidence: ${pick.evidence[0]}\n\nMain risk: ${pick.risks[0]}\n\nFreshness and sources: static sample dataset, demo-v1. No live feed or external sources connected.`;
 }

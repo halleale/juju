@@ -5,7 +5,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
 import { picks } from './demo';
-import { BOOKS, agentReply, american, price, validateBet } from './domain';
+import { BOOKS, american, price, validateBet } from './domain';
+import { agentReply } from './agent';
+import ResearchBrief from './components/ResearchBrief';
 import type { ManualBet, Pick } from './domain';
 
 type Tab = 'Picks' | 'Games' | 'My Picks' | 'Results';
@@ -80,6 +82,7 @@ export default function App() {
       <Text style={s.small}>{new Date(p.kickoff).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} · local time</Text>
       <View style={[s.row, { marginTop: 16 }]}><Text style={s.selection}>{label(p)}</Text><Text style={s.quote}>{american(p.odds)}</Text></View>
       <View style={s.row}><Text style={s.small}>{p.book} · fictional quote</Text><Text style={s.small}>View analysis →</Text></View>
+      <Text style={s.small}>Research only · unvalidated model{'\n'}Explore: {p.research?.factors[0]?.title || 'Evidence unavailable'}</Text>
     </Pressable>;
   }
   if (!loaded) return <SafeAreaView style={s.shell}><ActivityIndicator accessibilityLabel="Loading demo data" color="#a3f6ca" /></SafeAreaView>;
@@ -108,7 +111,7 @@ export default function App() {
     <Modal visible={!!detail} animationType="slide" onRequestClose={() => setDetail(null)}><SafeAreaView style={s.shell}>{detail && <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={s.content}>
       <Button title="← Back to research" secondary onPress={() => setDetail(null)} /><View style={s.banner}><Text style={s.bannerText}>SAMPLE ANALYSIS · NOT A LIVE RECOMMENDATION</Text></View><Text style={s.eyebrow}>{detail.market.toUpperCase()} / {status(detail)}</Text><Text style={s.title}>{label(detail)}</Text><Text style={s.body}>{detail.away} at {detail.home}</Text>
       <View style={s.card}><View style={s.row}><Text style={s.match}>{detail.book}</Text><Text style={s.quote}>{american(detail.odds)}</Text></View><Text style={s.small}>Fictional quote · static dataset · {detail.version}</Text><View style={[s.row, { marginTop: 20 }]}><View><Text style={s.small}>Sample win probability</Text><Text style={s.selection}>{percent(detail.win)}</Text></View><View><Text style={s.small}>Price break-even*</Text><Text style={s.selection}>{percent(price(detail.win, detail.push, detail.odds).breakEven)}</Text></View></View><Text style={s.body}>Illustrative expected return: {percent(price(detail.win, detail.push, detail.odds).expectedReturn)} per unit{detail.push > 0 ? ` · push probability ${percent(detail.push)}` : ''}</Text><Text style={s.small}>*Break-even applies conditional on a non-push outcome. Numerical edge and acceptable-price recommendations are withheld because no model has been validated.</Text></View>
-      <Text style={s.section}>Supporting evidence</Text>{detail.evidence.map(e => <Text key={e} style={s.body}>• {e}</Text>)}<Text style={s.section}>Reasons to pause</Text>{detail.risks.map(r => <Text key={r} style={s.body}>• {r}</Text>)}<Text style={s.small}>Source: authored sample fixtures in src/demo.ts. No verified injury, weather, or historical performance sources.</Text>
+      <ResearchBrief key={detail.id} pick={detail} now={now} />
       <Button title={saved.includes(detail.id) ? 'Remove saved pick' : 'Save research'} onPress={() => setSaved(prev => prev.includes(detail.id) ? prev.filter(id => id !== detail.id) : [...prev, detail.id])} /><Button title="Record an external bet" secondary onPress={startRecord} />
       {recording && <View style={s.card}><Text style={s.section}>Your actual price</Text><Text style={s.small}>This records an external bet; it does not place one. Demo records are not automatically graded.</Text><View style={s.wrap}>{BOOKS.map(b => <Chip key={b} text={b} selected={book === b} onPress={() => setBook(b)} />)}</View><Field title="American odds" value={odds} onChange={setOdds} placeholder="+110 or -125" />{detail.market !== 'Moneyline' && <Field title="Actual line" value={line} onChange={setLine} />}<Field title="Stake in USD (optional)" value={stake} onChange={setStake} placeholder="Leave blank to omit" />{!!formError && <Text accessibilityRole="alert" style={s.error}>{formError}</Text>}<Button title="Save external bet record" onPress={record} /><Button title="Cancel" secondary onPress={() => setRecording(false)} /></View>}
       <View style={s.notice}><Text style={s.noticeTitle}>Ask about this pick</Text><Text style={s.small}>Deterministic demo assistant · no AI service connected. Price questions keep the same line.</Text><View style={s.wrap}>{['Is this worth taking at -125?', 'What is the main risk?', 'Are there current injuries?'].map(q => <Chip key={q} text={q} onPress={() => { setQuestion(q); setAnswer(agentReply(detail, q)); }} />)}</View><Field title="Your question" value={question} onChange={setQuestion} placeholder="Is this worth taking at -125?" /><Button title="Ask demo assistant" disabled={!question.trim()} onPress={() => setAnswer(agentReply(detail, question))} />{!!answer && <Text selectable style={s.body}>{answer}</Text>}</View>

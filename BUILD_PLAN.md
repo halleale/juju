@@ -6,6 +6,8 @@ Goal: public iOS-first NFL research app; Android follows distribution review. So
 
 Four destinations, recommendation details, exact-price questions, separate saved picks/manual bets, local persistence, transparent illustrative outcomes. Validate usability with prospective users. Current implementation is this milestone; it has no live feed or validated model.
 
+Decision-brief increment completed: structured source-linked factors, supporting/opposing observations, planned model-use labels, original UTC timestamps, conditions for reevaluation, exact-line price checking, and uncertainty sensitivity. Shared qualification gates abstain for fictional/unvalidated evidence, missing provenance or counterevidence, stale quotes, unresolved critical inputs, changed lines, unverified user quotes, and insufficient conservative value. Model and rule validation flags remain false for every demo fixture. These flags must eventually refer to reviewed evaluation artifacts; they are not a substitute for running model evaluation or licensing provider data.
+
 ## Milestone 2 — shared backend and real research
 
 Python/FastAPI, PostgreSQL, object storage, managed jobs. Build provider adapters for odds, schedules/results, and authorized evidence. Normalize event IDs, market period, selection, line, book, and settlement rules. Preserve provider update, first available, ingestion, and analysis timestamps. Start with a small book set selected through user research.
