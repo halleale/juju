@@ -86,8 +86,8 @@ npm run lint
 | `src/components/` | Shared UI, pick card, tab bar, line chart, icons |
 | `src/lib/` | Odds math, consensus no-vig model, pick matching, tracker stats |
 | `src/pipeline/` | Odds provider interface, The Odds API adapter, market scoring and the ingest run (also runs in Deno) |
-| `src/data/` | Types and mock data (replaced by the live pipeline later) |
-| `src/state/` | Auth session and user settings (synced to Supabase when signed in) |
+| `src/data/` | Types and sample data (shown in demo mode and when signed out) |
+| `src/state/` | Auth session, user settings and tracked picks (synced to Supabase when signed in), live picks feed |
 | `supabase/functions/` | Edge Functions: `ingest-odds` (scheduled odds ingest and scoring) |
 | `supabase/migrations/` | Database schema and row-level security policies |
 | `supabase/tests/` | Database checks run by `npm run test:db` |

@@ -15,7 +15,7 @@ end $$;
 set role service_role;
 insert into public.events (external_id, sport, league, home, away, start_time) values ('evt1', 'NFL', 'NFL', 'Dolphins', 'Bills', now() + interval '2 days');
 insert into public.markets (event_id, type, selection, line) select id, 'total', 'Under', 47.5 from public.events;
-insert into public.picks (market_id, model_prob, implied_prob, best_price, best_book, edge, confidence) select id, 0.575, 0.5192, -108, 'A', 5.58, 'High' from public.markets;
+insert into public.picks (market_id, model_prob, implied_prob, best_price, best_book, edge, confidence, current_prob, current_edge) select id, 0.575, 0.5192, -108, 'A', 5.58, 'High', 0.575, 5.58 from public.markets;
 reset role;
 
 -- User A.

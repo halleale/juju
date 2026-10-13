@@ -5,8 +5,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BellIcon } from '@/components/icons';
 import { PickCard } from '@/components/pick-card';
 import { Display, Screen } from '@/components/ui';
-import { MARKETS_SCANNED, PICKS } from '@/data/mock';
 import { matchPicks } from '@/lib/picks';
+import { useFeed } from '@/state/feed';
 import { useSettings } from '@/state/settings';
 import { colors, fonts } from '@/theme';
 
@@ -14,8 +14,9 @@ const FOR_YOU = 'For you';
 
 export default function Picks() {
   const { settings } = useSettings();
+  const feed = useFeed();
   const [filter, setFilter] = useState(FOR_YOU);
-  const matched = matchPicks(PICKS, settings);
+  const matched = matchPicks(feed.picks, settings);
   const shown = filter === FOR_YOU ? matched : matched.filter((p) => p.sport === filter);
   const labels = [FOR_YOU, ...settings.sports];
 
@@ -28,7 +29,7 @@ export default function Picks() {
             <View style={s.titleText}>
               <Display>Your edges today</Display>
               <Text style={s.sub}>
-                Scanned {MARKETS_SCANNED.toLocaleString('en-US')} markets · {matched.length} fit your interests
+                Scanned {feed.marketsScanned.toLocaleString('en-US')} markets · {matched.length} fit your interests
               </Text>
             </View>
             <Link href="/alerts" asChild>
@@ -50,10 +51,17 @@ export default function Picks() {
           </ScrollView>
         </View>
       }>
+      {feed.error && (
+        <Pressable accessibilityRole="button" onPress={feed.refresh} style={s.error}>
+          <Text style={s.errorText}>Could not load the latest picks. Tap to try again.</Text>
+        </Pressable>
+      )}
+      {!feed.live && <Text style={s.demo}>Sample picks. Sign in to see live edges.</Text>}
       {shown.map((p) => (
         <PickCard key={p.id} pick={p} matchReason={p.matchReason} />
       ))}
-      {shown.length === 0 && (
+      {feed.loading && <Text style={s.demo}>Loading your edges…</Text>}
+      {!feed.loading && shown.length === 0 && (
         <View style={s.empty}>
           <Text style={s.emptyTitle}>No edges right now</Text>
           <Text style={s.emptyBody}>Your agent keeps scanning. You will get an alert when something fits your interests.</Text>
@@ -80,5 +88,8 @@ const s = StyleSheet.create({
   empty: { gap: 6, padding: 20, borderRadius: 18, backgroundColor: colors.surface, alignItems: 'center' },
   emptyTitle: { fontFamily: fonts.sansSemi, fontSize: 15, color: colors.text },
   emptyBody: { fontFamily: fonts.sans, fontSize: 13, lineHeight: 19, color: colors.muted, textAlign: 'center' },
+  error: { padding: 14, borderRadius: 14, backgroundColor: colors.cautionSoft },
+  errorText: { fontFamily: fonts.sansMedium, fontSize: 13, color: colors.caution, textAlign: 'center' },
+  demo: { fontFamily: fonts.sans, fontSize: 13, color: colors.muted, textAlign: 'center' },
   disclaimer: { fontFamily: fonts.sans, fontSize: 12, lineHeight: 18, color: colors.faint, textAlign: 'center', paddingVertical: 8, paddingHorizontal: 12 },
 });

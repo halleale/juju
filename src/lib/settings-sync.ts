@@ -66,7 +66,23 @@ export function profilePatch(patch: Partial<Settings>, now = new Date()): Partia
   return out;
 }
 
-/** Settings as stored remotely. Local-only fields (tracked picks for mock data) are not included. */
+export type UserPickRow = { pick_id: number; tracked: boolean; line_alert: boolean };
+
+/** Tracked picks and line alerts as stored in user_picks. */
+export function pickListsFromRemote(rows: UserPickRow[]): Pick<Settings, 'tracked' | 'lineAlerts'> {
+  return {
+    tracked: rows.filter((r) => r.tracked).map((r) => String(r.pick_id)),
+    lineAlerts: rows.filter((r) => r.line_alert).map((r) => String(r.pick_id)),
+  };
+}
+
+/** The user_picks row for a pick, or null for sample picks (non-numeric ids), which stay local. */
+export function userPickRow(pickId: string, s: Pick<Settings, 'tracked' | 'lineAlerts'>): UserPickRow | null {
+  if (!/^\d+$/.test(pickId)) return null;
+  return { pick_id: Number(pickId), tracked: s.tracked.includes(pickId), line_alert: s.lineAlerts.includes(pickId) };
+}
+
+/** Settings as stored in profiles and user_interests. Tracked picks come from pickListsFromRemote. */
 export function settingsFromRemote(profile: ProfileRow, interests: InterestRow[]): Partial<Settings> {
   const of = (kind: InterestKind) => interests.filter((i) => i.kind === kind).map((i) => i.value);
   return {

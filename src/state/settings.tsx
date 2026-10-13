@@ -3,13 +3,16 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { DEFAULT_SETTINGS, type Settings } from '@/lib/settings-model';
 import {
   INTEREST_KINDS,
+  pickListsFromRemote,
   PROFILE_COLUMNS,
   profilePatch,
   resolveSignIn,
   settingsFromRemote,
+  userPickRow,
   type InterestKey,
   type InterestRow,
   type ProfileRow,
+  type UserPickRow,
 } from '@/lib/settings-sync';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './auth';
@@ -35,13 +38,21 @@ const SettingsContext = createContext<Ctx | null>(null);
 
 async function loadRemote(userId: string) {
   if (!supabase) throw new Error('Supabase is not configured');
-  const [profile, interests] = await Promise.all([
+  const [profile, interests, picks] = await Promise.all([
     supabase.from('profiles').select(PROFILE_COLUMNS).eq('id', userId).single<ProfileRow>(),
     supabase.from('user_interests').select('kind,value').returns<InterestRow[]>(),
+    supabase.from('user_picks').select('pick_id,tracked,line_alert').returns<UserPickRow[]>(),
   ]);
   if (profile.error) throw profile.error;
   if (interests.error) throw interests.error;
-  return settingsFromRemote(profile.data, interests.data ?? []);
+  if (picks.error) throw picks.error;
+  return { settings: settingsFromRemote(profile.data, interests.data ?? []), picks: pickListsFromRemote(picks.data ?? []) };
+}
+
+async function savePick(userId: string, row: UserPickRow) {
+  if (!supabase) return;
+  const { error } = await supabase.from('user_picks').upsert({ user_id: userId, ...row });
+  if (error) throw error;
 }
 
 async function saveProfile(userId: string, patch: Partial<Settings>) {
@@ -105,16 +116,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const remote = await loadRemote(userId);
+        const { settings: remote, picks } = await loadRemote(userId);
         const action = resolveSignIn(latest.current, remote);
-        if (action === 'use_remote') {
-          const merged = { ...latest.current, ...remote };
-          latest.current = merged;
-          setSettings(merged);
-        } else if (action === 'upload_local') {
-          await saveAll(userId, latest.current);
-        }
+        if (action === 'upload_local') await saveAll(userId, latest.current);
         if (cancelled) return;
+        // Tracked picks always come from the account; local ones were sample picks.
+        const merged = { ...latest.current, ...(action === 'use_remote' ? remote : {}), ...picks };
+        latest.current = merged;
+        setSettings(merged);
         setSaveError(null);
         setLoad({ userId, attempt: reloadKey, ok: true });
       } catch (e) {
@@ -159,6 +168,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       latest.current = next;
       setSettings(next);
       if (key in INTEREST_KINDS) persist(() => saveInterests(key as InterestKey, nextList));
+      if (key === 'tracked' || key === 'lineAlerts') {
+        const row = userPickRow(value as string, next);
+        if (row) persist((uid) => savePick(uid, row));
+      }
     },
     [persist],
   );

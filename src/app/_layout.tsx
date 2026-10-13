@@ -8,6 +8,7 @@ import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
 
 import { AuthProvider } from '@/state/auth';
+import { FeedProvider } from '@/state/feed';
 import { SettingsProvider } from '@/state/settings';
 import { colors } from '@/theme';
 
@@ -32,8 +33,10 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <SettingsProvider>
-        <StatusBar style="light" />
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
+        <FeedProvider>
+          <StatusBar style="light" />
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
+        </FeedProvider>
       </SettingsProvider>
     </AuthProvider>
   );

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { profilePatch, resolveSignIn, settingsFromRemote, type ProfileRow } from '@/lib/settings-sync';
+import { pickListsFromRemote, profilePatch, resolveSignIn, settingsFromRemote, userPickRow, type ProfileRow } from '@/lib/settings-sync';
 import { DEFAULT_SETTINGS } from '@/lib/settings-model';
 
 const NOW = new Date('2026-10-06T12:00:00Z');
@@ -87,5 +87,23 @@ describe('resolveSignIn', () => {
 
   it('does nothing when neither side has onboarded', () => {
     expect(resolveSignIn(DEFAULT_SETTINGS, fresh)).toBe('nothing');
+  });
+});
+
+describe('tracked picks', () => {
+  it('reads tracked picks and line alerts from user_picks', () => {
+    expect(
+      pickListsFromRemote([
+        { pick_id: 1, tracked: true, line_alert: false },
+        { pick_id: 2, tracked: true, line_alert: true },
+        { pick_id: 3, tracked: false, line_alert: true },
+      ]),
+    ).toEqual({ tracked: ['1', '2'], lineAlerts: ['2', '3'] });
+  });
+
+  it('builds the row for a live pick and skips sample picks', () => {
+    expect(userPickRow('7', { tracked: ['7'], lineAlerts: [] })).toEqual({ pick_id: 7, tracked: true, line_alert: false });
+    expect(userPickRow('7', { tracked: [], lineAlerts: [] })).toEqual({ pick_id: 7, tracked: false, line_alert: false });
+    expect(userPickRow('buf-mia-under', { tracked: ['buf-mia-under'], lineAlerts: [] })).toBeNull();
   });
 });

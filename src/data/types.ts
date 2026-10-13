@@ -24,6 +24,8 @@ export type Pick = {
   signals: Signal[];
   /** Current price at each book for this selection. */
   books: { book: string; price: number }[];
+  /** When the pick opened (live picks only). */
+  openedAt?: string;
   /** The line (or price, for moneylines) over time, oldest first. */
   line: { label: string; open: number; points: number[]; startLabel: string; nowLabel: string };
 };

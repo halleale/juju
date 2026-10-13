@@ -4,9 +4,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { BackIcon, MinusIcon, PlusIcon } from '@/components/icons';
 import { LineChart } from '@/components/line-chart';
 import { Footer, Screen, SectionLabel } from '@/components/ui';
-import { PICKS } from '@/data/mock';
 import { formatAmerican, formatPct, formatSigned } from '@/lib/odds';
 import { booksByPrice, MARKET_LABEL, pickStats, STYLE_LABEL, suggestedUnits } from '@/lib/picks';
+import { useFeed, usePriceLine } from '@/state/feed';
 import { useSettings } from '@/state/settings';
 import { colors, fonts } from '@/theme';
 
@@ -18,9 +18,11 @@ function goBack() {
 export default function PickDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { settings, toggleIn } = useSettings();
-  const pick = PICKS.find((p) => p.id === id);
+  const { picks } = useFeed();
+  const pick = picks.find((p) => p.id === id);
+  const line = usePriceLine(pick);
 
-  if (!pick) {
+  if (!pick || !line) {
     return (
       <Screen>
         <BackButton />
@@ -33,7 +35,7 @@ export default function PickDetail() {
   const books = booksByPrice(pick);
   const tracked = settings.tracked.includes(pick.id);
   const alertOn = settings.lineAlerts.includes(pick.id);
-  const fmtLine = (v: number) => (pick.line.label === 'Price' ? formatAmerican(v) : String(v));
+  const fmtLine = (v: number) => (line.label === 'Price' ? formatAmerican(v) : String(v));
   const units = suggestedUnits(settings.style);
 
   return (
@@ -78,13 +80,13 @@ export default function PickDetail() {
 
       <View style={[s.card, { gap: 10 }]}>
         <View style={s.cardHead}>
-          <SectionLabel style={{ letterSpacing: 1 }}>{pick.line.label === 'Price' ? 'Price movement' : 'Line movement'}</SectionLabel>
-          <Text style={s.opened}>Opened {fmtLine(pick.line.open)}</Text>
+          <SectionLabel style={{ letterSpacing: 1 }}>{line.label === 'Price' ? 'Price movement' : 'Line movement'}</SectionLabel>
+          <Text style={s.opened}>Opened {fmtLine(line.open)}</Text>
         </View>
-        <LineChart points={pick.line.points} label={`${pick.line.label} moved from ${fmtLine(pick.line.open)} at open to ${pick.line.nowLabel} now`} />
+        <LineChart points={line.points} label={`${line.label} moved from ${fmtLine(line.open)} at open to ${line.nowLabel} now`} />
         <View style={s.cardHead}>
-          <Text style={s.axis}>{pick.line.startLabel}</Text>
-          <Text style={s.axis}>Now · {pick.line.nowLabel}</Text>
+          <Text style={s.axis}>{line.startLabel}</Text>
+          <Text style={s.axis}>Now · {line.nowLabel}</Text>
         </View>
       </View>
 

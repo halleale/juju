@@ -16,7 +16,7 @@ export type Settings = {
   toggles: AlertToggles;
   /** Weekly budget in dollars; null means no limit set. */
   weeklyLimit: number | null;
-  /** Local only until picks come from the database (build step 3). */
+  /** Pick ids. Synced to user_picks when signed in; sample picks stay local. */
   tracked: string[];
   lineAlerts: string[];
 };
