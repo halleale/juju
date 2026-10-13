@@ -37,6 +37,7 @@ yarn-error.*
 __pycache__/
 *.pyc
 .data/
+work/
 
 # typescript
 *.tsbuildinfo

@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .providers import quote_status
+from .events import slate_events
 from .store import Store, utcnow
 
 app = FastAPI(title='juju research', version='0.1.0')
@@ -32,11 +33,14 @@ def providers():
 
 @app.get('/v1/slate')
 def slate(league: Literal['nfl', 'ncaaf'] = 'nfl'):
-    snapshot = store().latest('odds', league)
+    db = store()
+    snapshot = db.latest('odds', league)
     if not snapshot:
-        return {'league': league, 'status': 'unavailable', 'quotes': [], 'recommendationsEnabled': False, 'message': 'No provider snapshot has been collected. No sample quotes are substituted.'}
-    quotes = [{**q, 'status': quote_status(q, utcnow())} for q in snapshot['data']['quotes']]
-    return {'league': league, 'status': 'available' if quotes else 'empty', 'snapshotId': snapshot['snapshotId'], 'ingestedAt': snapshot['ingestedAt'], 'quotes': quotes, 'recommendationsEnabled': False, 'message': 'Provider research only. No validated model probabilities or recommendations.'}
+        return {'league': league, 'status': 'unavailable', 'quotes': [], 'events': [], 'recommendationsEnabled': False, 'message': 'No provider snapshot has been collected. No sample quotes are substituted.'}
+    now = utcnow()
+    quotes = [{**q, 'status': quote_status(q, now)} for q in snapshot['data']['quotes']]
+    events = slate_events(quotes, db.latest_targets('nflverse' if league == 'nfl' else 'cfbd'))
+    return {'league': league, 'status': 'available' if quotes else 'empty', 'snapshotId': snapshot['snapshotId'], 'ingestedAt': snapshot['ingestedAt'], 'asOf': now.isoformat(), 'quotes': quotes, 'events': events, 'recommendationsEnabled': False, 'message': 'Provider research only. No validated model probabilities or recommendations.'}
 
 
 @app.get('/v1/research')

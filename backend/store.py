@@ -62,6 +62,11 @@ class Store:
             row = db.execute('SELECT id,at,body FROM snapshots WHERE provider=? ORDER BY id DESC LIMIT 1', (provider,)).fetchone() if target is None else db.execute('SELECT id,at,body FROM snapshots WHERE provider=? AND target=? ORDER BY id DESC LIMIT 1', (provider, target)).fetchone()
         return {'snapshotId': row[0], 'ingestedAt': row[1], 'data': json.loads(row[2])} if row else None
 
+    def latest_targets(self, provider):
+        with self.connect() as db:
+            rows = db.execute('SELECT target,id,at,body FROM snapshots WHERE id IN (SELECT MAX(id) FROM snapshots WHERE provider=? GROUP BY target)', (provider,)).fetchall()
+        return {row[0]: {'snapshotId': row[1], 'ingestedAt': row[2], 'data': json.loads(row[3])} for row in rows}
+
 
 def utcnow():
     return datetime.now(timezone.utc)

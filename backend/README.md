@@ -42,9 +42,10 @@ These are request limits, **not dollar billing enforcement**. Start with free/tr
 - `GET /health`: service health, recommendations disabled.
 - `GET /v1/providers`: credential presence and local usage counts, never secret values.
 - `GET /v1/slate?league=nfl|ncaaf`: cached normalized quotes, with provider timestamp and current/stale/expired/unavailable status. No pricing across different lines.
+- Slate responses also include distinct odds-event IDs and matched schedule source IDs, week, venue, original kickoff, collection time, and missing-stat status. Unknown/ambiguous matches attach no research. Read requests never collect provider data.
 - Book-only timestamps retain their scope and receive `book_timestamp_only` status rather than an assertion of exact-market freshness. Ingestion time never substitutes for provider time.
 - `GET /v1/research?league=ncaaf&year=2026&week=7`: stored research snapshot.
 
 Set the mobile app's non-secret `EXPO_PUBLIC_RESEARCH_API_URL` to a reachable API base URL and restart Expo to show the separate provider research panel. An Expo tunnel exposes Metro, not this API; an iPhone cannot reach a Mac's `127.0.0.1`. Use a suitable development-network address or a secured hosted backend. The app remains usable in demo mode without this variable.
 
-Tests: `python3 -m unittest discover -s backend/tests -v`. Mocked provider tests consume no API quota. A live nflverse schedule collection can be checked separately without a key. Odds and CFBD require their own successful live validation before claiming they work.
+Tests: `python3 -m unittest discover -s backend/tests -v`. Mocked provider tests consume no API quota. A live nflverse schedule collection can be checked separately without a key. NFL/NCAAF odds and CFBD schedules passed bounded live validation on October 12, 2026; CFBD advanced stats for week 7 were empty. See [validation report](../LIVE_VALIDATION.md). This proves those requests worked at that time, not continuous availability or a live recommendation service.
