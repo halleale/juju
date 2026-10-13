@@ -1,6 +1,6 @@
 # juju — NFL research prototype
 
-iOS-first React Native / Expo app with a web build for development. This is a local, fictional-data prototype, not a production recommendation service.
+iOS-first React Native / Expo app with a web build for development. NFL and FBS college football sample research is available locally. An optional read-only backend serves separately labeled provider quotes; this is not a production recommendation service.
 
 ## Run
 
@@ -26,6 +26,7 @@ If Expo metadata services are blocked, `EXPO_OFFLINE=1 npm run web` uses the ins
 ## Implemented
 
 - Onboarding and book preferences.
+- NFL/NCAAF league selection, persisted on device, with separate fictional FBS scenarios.
 - Picks, Games, My Picks, Results, recommendation details, and watching/withdrawn/settled examples.
 - Separate saved research and manually entered external bets, persisted on device with AsyncStorage.
 - Exact-price sample calculations with push-aware expected return.
@@ -46,4 +47,4 @@ In a decision brief, inspect supporting and opposing factors, open their source 
 
 ## Next milestone
 
-See [BUILD_PLAN.md](BUILD_PLAN.md). No feed credentials, user authentication, paid subscription, server, live AI agent, live grading, model training, notifications, or production eligibility controls are configured. Do not submit this prototype as a production betting product.
+See [BUILD_PLAN.md](BUILD_PLAN.md) and [backend setup](backend/README.md). The provider backend has shared caching, persistent request caps, read-only research endpoints, and explicit collection commands. NFL schedule collection has been checked independently; odds and college data require credentials and live validation. No paid subscriptions, user authentication, live AI agent, live grading, model training, notifications, or production eligibility controls are configured. Do not submit this prototype as a production betting product.

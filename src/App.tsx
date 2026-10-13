@@ -8,10 +8,11 @@ import { picks } from './demo';
 import { BOOKS, american, price, validateBet } from './domain';
 import { agentReply } from './agent';
 import ResearchBrief from './components/ResearchBrief';
+import ProviderFeed from './components/ProviderFeed';
 import type { ManualBet, Pick } from './domain';
 
 type Tab = 'Picks' | 'Games' | 'My Picks' | 'Results';
-type Preferences = { onboarded: boolean; books: string[] };
+type Preferences = { onboarded: boolean; books: string[]; league: 'nfl' | 'ncaaf' };
 const KEY = 'juju-demo-v1';
 const percent = (n: number) => `${(n * 100).toFixed(1)}%`;
 const label = (p: Pick) => `${p.selection}${p.line === null ? '' : ` ${p.line > 0 && p.market === 'Spread' ? '+' : ''}${p.line}`}`;
@@ -28,7 +29,7 @@ export default function App() {
   const params = useLocalSearchParams<{ tab?: string; pick?: string; settings?: string }>();
   const tab: Tab = (['Picks', 'Games', 'My Picks', 'Results'] as string[]).includes(params.tab || '') ? params.tab as Tab : 'Picks';
   function setTab(next: Tab) { router.setParams({ tab: next }); }
-  const [preferences, setPreferences] = useState<Preferences>({ onboarded: false, books: [...BOOKS] });
+  const [preferences, setPreferences] = useState<Preferences>({ onboarded: false, books: [...BOOKS], league: 'nfl' });
   const [saved, setSaved] = useState<string[]>([]);
   const [bets, setBets] = useState<ManualBet[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -53,7 +54,7 @@ export default function App() {
       if (!Array.isArray(data.saved) || !Array.isArray(data.bets) || !data.preferences || !Array.isArray(data.preferences.books)) throw new Error('Invalid local data');
       setSaved(data.saved.filter((id: unknown) => typeof id === 'string' && picks.some(p => p.id === id)));
       setBets(data.bets.filter((b: ManualBet) => b && picks.some(p => p.id === b.pickId) && typeof b.odds === 'number' && typeof b.id === 'string'));
-      setPreferences({ onboarded: data.preferences.onboarded === true, books: data.preferences.books.filter((b: string) => BOOKS.includes(b)) });
+      setPreferences({ onboarded: data.preferences.onboarded === true, league: data.preferences.league === 'ncaaf' ? 'ncaaf' : 'nfl', books: data.preferences.books.filter((b: string) => BOOKS.includes(b)) });
     }).catch(() => setStorageError('Could not restore local data. Demo changes will stay in this session.')).finally(() => setLoaded(true));
     const timer = setInterval(() => setNow(Date.now()), 30000);
     const sub = AppState.addEventListener('change', state => { if (state === 'active') setNow(Date.now()); });
@@ -74,10 +75,13 @@ export default function App() {
       setRecording(false); setDetail(null); setTab('My Picks');
     } catch (err) { setFormError((err as Error).message); }
   }
-  const visible = picks.filter(p => p.status === 'active' && Date.parse(p.kickoff) > now && preferences.books.includes(p.book));
+  const leaguePicks = picks.filter(p => (p.league || 'nfl') === preferences.league);
+  const history = leaguePicks.filter(p => p.outcome !== 'pending');
+  const watching = leaguePicks.find(p => p.status === 'watching');
+  const visible = leaguePicks.filter(p => p.status === 'active' && Date.parse(p.kickoff) > now && preferences.books.includes(p.book));
   function card(p: Pick) {
     return <Pressable key={p.id} accessibilityRole="button" accessibilityLabel={`View ${label(p)}`} onPress={() => open(p)} style={s.card}>
-      <View style={s.row}><Text style={s.eyebrow}>{p.market.toUpperCase()}</Text><Text style={[s.small, { color: p.status === 'watching' ? '#f8c784' : '#89dbb3' }]}>{status(p)}</Text></View>
+      <View style={s.row}><Text style={s.eyebrow}>{(p.league || 'nfl').toUpperCase()} · {p.market.toUpperCase()}</Text><Text style={[s.small, { color: p.status === 'watching' ? '#f8c784' : '#89dbb3' }]}>{status(p)}</Text></View>
       <Text style={s.match}>{p.away} <Text style={s.muted}>at</Text> {p.home}</Text>
       <Text style={s.small}>{new Date(p.kickoff).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} · local time</Text>
       <View style={[s.row, { marginTop: 16 }]}><Text style={s.selection}>{label(p)}</Text><Text style={s.quote}>{american(p.odds)}</Text></View>
@@ -88,7 +92,7 @@ export default function App() {
   if (!loaded) return <SafeAreaView style={s.shell}><ActivityIndicator accessibilityLabel="Loading demo data" color="#a3f6ca" /></SafeAreaView>;
   if (!preferences.onboarded) return <SafeAreaView style={s.shell}><StatusBar style="light" /><ScrollView contentContainerStyle={s.content}>
     <Text style={s.brand}>juju<Text style={{ color: '#a3f6ca' }}>.</Text></Text><Text style={[s.title, { marginTop: 36 }]}>A clearer view{'\n'}of every pick.</Text>
-    <Text style={s.body}>NFL research, price context, and a record you can revisit. Passing is a decision, too.</Text>
+    <Text style={s.body}>NFL and college football research, price context, and a record you can revisit. Passing is a decision, too.</Text>
     <View style={s.notice}><Text style={s.noticeTitle}>Interactive prototype · sample data</Text><Text style={s.body}>All games, odds, probabilities, evidence, and outcomes are illustrative. No live advice, accounts, or sportsbook connection.</Text></View>
     <Text style={s.section}>Choose your books</Text><View style={s.wrap}>{BOOKS.map(b => <Chip key={b} text={b} selected={preferences.books.includes(b)} onPress={() => toggleBook(b)} />)}</View>
     <Text style={s.small}>Proposed launch policy: adults 21+ in supported US jurisdictions. This prototype does not verify age or location; those controls are required before public release.</Text>
@@ -98,12 +102,12 @@ export default function App() {
     <View style={s.header}><Text style={s.brand}>juju<Text style={{ color: '#a3f6ca' }}>.</Text></Text><Pressable accessibilityRole="button" onPress={() => setSettings(true)}><Text style={s.small}>Preferences ⚙</Text></Pressable></View>
     <ScrollView contentContainerStyle={s.content}>
       <View style={s.banner}><Text style={s.bannerText}>DEMO MODE · FICTIONAL DATA · NO LIVE FEEDS</Text></View>{!!storageError && <Text accessibilityRole="alert" style={s.error}>{storageError}</Text>}
-      <Text style={s.eyebrow}>NFL / RESEARCH DESK</Text><Text style={s.title}>{tab === 'Picks' ? 'Find your edge.' : tab === 'Games' ? 'The weekly slate.' : tab === 'My Picks' ? 'Your decision log.' : 'Every pick counts.'}</Text>
+      <View style={s.wrap}>{(['nfl', 'ncaaf'] as const).map(league => <Chip key={league} text={league === 'nfl' ? 'NFL' : 'NCAAF · FBS'} selected={preferences.league === league} onPress={() => setPreferences(prev => ({ ...prev, league }))} />)}</View><Text style={s.eyebrow}>{preferences.league.toUpperCase()} / RESEARCH DESK</Text><Text style={s.title}>{tab === 'Picks' ? 'Find your edge.' : tab === 'Games' ? 'The weekly slate.' : tab === 'My Picks' ? 'Your decision log.' : 'Every pick counts.'}</Text>
       <Text style={s.body}>{tab === 'Picks' ? 'Explore price, evidence, and the reasons to pass.' : tab === 'Games' ? 'Follow the matchup, even when there is no pick.' : tab === 'My Picks' ? 'Saved research and recorded bets stay separate.' : 'Losses, pushes, and withdrawals stay in the record.'}</Text>
-      {tab === 'Picks' && <><View style={s.row}><Text style={s.section}>Sample opportunities</Text><Text style={s.small}>{visible.length} shown</Text></View><View style={s.wrap}>{BOOKS.map(b => <Chip key={b} text={b} selected={preferences.books.includes(b)} onPress={() => toggleBook(b)} />)}</View>{visible.map(card)}{!visible.length && <View style={s.card}><Text style={s.match}>No sample picks available</Text><Text style={s.body}>Choose a supported book, or inspect games. Demo picks expire at their fixed kickoff times.</Text></View>}<View style={s.notice}><Text style={s.noticeTitle}>Waiting is part of the process</Text><Text style={s.body}>The Seattle–San Francisco sample is watching an unresolved input. No pick is published.</Text><Button title="Inspect game" secondary onPress={() => open(picks[2])} /></View></>}
-      {tab === 'Games' && <>{picks.slice(0, 3).map(card)}<Text style={s.small}>Sample fixtures are fixed, not an actual NFL schedule.</Text></>}
+      {tab === 'Picks' && <><View style={s.row}><Text style={s.section}>Sample opportunities</Text><Text style={s.small}>{visible.length} shown</Text></View><View style={s.wrap}>{BOOKS.map(b => <Chip key={b} text={b} selected={preferences.books.includes(b)} onPress={() => toggleBook(b)} />)}</View>{visible.map(card)}{!visible.length && <View style={s.card}><Text style={s.match}>No sample picks available</Text><Text style={s.body}>Choose a supported book, or inspect games. Demo picks expire at their fixed kickoff times.</Text></View>}<View style={s.notice}><Text style={s.noticeTitle}>Waiting is part of the process</Text><Text style={s.body}>The {watching?.away}–{watching?.home} sample is watching an unresolved input. No pick is published.</Text><Button title="Inspect game" secondary onPress={() => watching && open(watching)} /></View></>}
+      {tab === 'Games' && <><ProviderFeed key={preferences.league} league={preferences.league} />{leaguePicks.filter(p => p.outcome === 'pending').map(card)}<Text style={s.small}>Sample fixtures are fixed, not an actual NFL schedule.</Text></>}
       {tab === 'My Picks' && <><Text style={s.section}>Saved research · {saved.length}</Text>{saved.length ? picks.filter(p => saved.includes(p.id)).map(card) : <View style={s.card}><Text style={s.match}>Keep a pick for later</Text><Text style={s.body}>Open an analysis and save it here. Saving does not record a bet.</Text><Button title="Browse picks" secondary onPress={() => setTab('Picks')} /></View>}<Text style={s.section}>Recorded external bets · {bets.length}</Text>{bets.map(b => { const p = picks.find(v => v.id === b.pickId)!; return <View key={b.id} style={s.card}><Text style={s.match}>{p.selection} · {p.market}</Text><Text style={s.body}>{b.book} · {b.line !== null ? `line ${b.line} · ` : ''}{american(b.odds)}{b.stake !== null ? ` · $${b.stake.toFixed(2)} recorded stake` : ''}</Text><Text style={s.small}>Original sample: {label(p)} at {american(p.odds)}{'\n'}Manual record · settlement pending · no sportsbook connection</Text><Button title="View original analysis" secondary onPress={() => open(p)} /><Button title="Delete record" secondary onPress={() => setBets(prev => prev.filter(v => v.id !== b.id))} /></View>; })}{!bets.length && <Text style={s.body}>No external bets recorded. Actual book, line, and price are entered separately from the original sample pick.</Text>}</>}
-      {tab === 'Results' && <><View style={s.card}><Text style={s.eyebrow}>ILLUSTRATIVE PUBLISHED COHORT</Text><Text style={s.selection}>3 records · demo-v1</Text><Text style={s.body}>1 win · 1 loss · 1 push{'\n'}Includes 1 withdrawn recommendation.</Text><Text style={s.small}>This tiny fictional sample cannot establish performance. No ROI, profitability, or validated edge claims are made.</Text></View>{picks.filter(p => p.outcome !== 'pending').map(p => <View key={p.id}>{card(p)}<Text style={[s.small, { marginTop: 8, marginLeft: 8 }]}>Sample outcome: {p.outcome.toUpperCase()} · original quote retained</Text></View>)}<Text style={s.small}>Personal bets are excluded. Live settlement and model evaluation are not connected.</Text></>}
+      {tab === 'Results' && <><View style={s.card}><Text style={s.eyebrow}>ILLUSTRATIVE PUBLISHED COHORT</Text><Text style={s.selection}>{history.length} records · demo-v1</Text><Text style={s.body}>{history.filter(p => p.outcome === 'win').length} win · {history.filter(p => p.outcome === 'loss').length} loss · {history.filter(p => p.outcome === 'push').length} push{'\n'}Includes {history.filter(p => p.status === 'withdrawn').length} withdrawn recommendation.</Text><Text style={s.small}>This tiny fictional sample cannot establish performance. No ROI, profitability, or validated edge claims are made.</Text></View>{history.map(p => <View key={p.id}>{card(p)}<Text style={[s.small, { marginTop: 8, marginLeft: 8 }]}>Sample outcome: {p.outcome.toUpperCase()} · original quote retained</Text></View>)}<Text style={s.small}>Personal bets are excluded. Live settlement and model evaluation are not connected.</Text></>}
       <Text style={[s.small, { textAlign: 'center', marginTop: 12 }]}>Research can end with a pass. No bets are placed in juju.</Text>
     </ScrollView>
     <View style={s.nav}>{(['Picks', 'Games', 'My Picks', 'Results'] as Tab[]).map((t, i) => <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => setTab(t)} style={s.navItem}><Text style={{ color: tab === t ? '#a3f6ca' : '#728696', fontSize: 20 }}>{['◇', '▦', '▱', '↗'][i]}</Text><Text style={[s.small, { color: tab === t ? '#a3f6ca' : '#728696' }]}>{t}</Text></Pressable>)}</View>

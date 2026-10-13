@@ -1,6 +1,6 @@
 # Build plan
 
-Goal: public iOS-first NFL research app; Android follows distribution review. Source requirements: uploaded NFL Betting Agent PRD dated October 12, 2026.
+Goal: public iOS-first NFL and FBS college football research app; Android follows distribution review. Source requirements: uploaded NFL Betting Agent PRD dated October 12, 2026, extended by the user's request for NCAAF. Initial total data budget is under $100/month. Selected stack: The Odds API, CollegeFootballData, and nflverse; SportsDataIO is excluded.
 
 ## Milestone 1 — local product prototype
 
@@ -11,6 +11,8 @@ Decision-brief increment completed: structured source-linked factors, supporting
 ## Milestone 2 — shared backend and real research
 
 Python/FastAPI, PostgreSQL, object storage, managed jobs. Build provider adapters for odds, schedules/results, and authorized evidence. Normalize event IDs, market period, selection, line, book, and settlement rules. Preserve provider update, first available, ingestion, and analysis timestamps. Start with a small book set selected through user research.
+
+Initial backend increment: FastAPI read-only endpoints, explicit provider collection commands, SQLite snapshot/usage store, NFL/NCAAF odds normalization, CFBD regular-season FBS games/advanced stats collection, and nflverse schedules/results. App reads shared quote snapshots in a separate research panel; no model probabilities are attached. Keys are server-only. Default caps and cache policies are conservative development settings, not a dollar billing guarantee. Live odds/CFBD validation, plan pricing, commercial rights, postseason collection, ID reconciliation, NFL statistical features, injury feeds, production deployment/auth, and database migration remain outstanding.
 
 Implement API contracts for slate, game analysis, exact-line quote evaluation, recommendation revisions, user preferences, saved picks, manual bets, history, and deletion. Move pricing and qualification authority to the server. The demo's local calculations are illustrative only.
 

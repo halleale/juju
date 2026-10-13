@@ -1,12 +1,13 @@
 import type { ResearchSnapshot } from './research';
 export type Market = 'Moneyline' | 'Spread' | 'Total';
+export type League = 'nfl' | 'ncaaf';
 export type Outcome = 'win' | 'loss' | 'push' | 'void' | 'pending';
 export type Pick = {
   id: string; away: string; home: string; kickoff: string; market: Market;
   selection: string; line: number | null; odds: number; book: string;
   win: number; push: number; evidence: string[]; risks: string[];
   status: 'active' | 'watching' | 'withdrawn' | 'settled';
-  outcome: Outcome; version: string; research?: ResearchSnapshot;
+  outcome: Outcome; version: string; research?: ResearchSnapshot; league?: League;
 };
 export type ManualBet = { id: string; pickId: string; book: string; odds: number; line: number | null; stake: number | null; recordedAt: string };
 export const BOOKS = ['DraftKings', 'FanDuel', 'BetMGM'];
